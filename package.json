@@ -1,0 +1,32 @@
+{
+  "name": "target-app-igbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon app.js",
+    "dev-logs": "cross-env NODE_ENV=development LOGGING=yes nodemon app.js",
+    "production": "cross-env NODE_ENV=production node app.js",
+    "production-logs": "cross-env NODE_ENV=production LOGGING=yes node app.js"
+  },
+  "author": "Vlad Kuznetsov",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "i18n": "^0.13.3",
+    "morgan": "^1.10.0",
+    "node-fetch": "^2.6.1",
+    "pg": "^8.7.1"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "nodemon": "^2.0.12",
+    "prettier": "^2.3.2"
+  },
+  "optionalDependencies": {
+    "fsevents": "^2.3.2"
+  }
+}
