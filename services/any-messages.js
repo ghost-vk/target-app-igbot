@@ -1,9 +1,10 @@
 const Response = require('./response'),
   i18n = require('./../i18n.config'),
-  config = require('./config')
+  config = require('./config'),
+  { notify } = require('./telegram-bot')
 
 module.exports = class AnyMessages {
-  static handlePayload(payload) {
+  static async handlePayload(payload, user) {
     switch (payload) {
       case 'ANY_GET_CONTACTS': {
         return Response.genText(i18n.__('ig.profile.contacts'))
@@ -28,6 +29,7 @@ module.exports = class AnyMessages {
         )
       }
       case 'ANY_CALL_OPERATOR': {
+        await notify(user.name)
         return Response.genText(i18n.__('ig.any.please_waiting'))
       }
       case 'ANY_TRY_CALL_OPERATOR': {

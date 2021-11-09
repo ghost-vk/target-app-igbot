@@ -7,6 +7,7 @@ const Consultation = require('./consultation')
 const TelegramChat = require('./telegram')
 const Target = require('./target')
 const { log, warn } = require('./../utils/log')
+const { notify } = require('./telegram-bot')
 
 module.exports = class Receive {
   constructor(user, webhookEvent) {
@@ -109,21 +110,25 @@ module.exports = class Receive {
   async handlePayload(payload) {
     log(`🔵 Received Payload: ${payload} for user ${this.user.igsid}`)
     let response
-    // Set the response based on the payload
-    if (payload === 'LID_MAGNET') {
-      response = LidMagnet.handlePayload(payload)
-    } else if (payload.includes('ANY_')) {
-      response = AnyMessage.handlePayload(payload, this.user)
-    } else if (payload.includes('CON_')) {
-      response = await Consultation.handlePayload(payload, this.user)
-    } else if (payload.includes('TG_')) {
-      response = await TelegramChat.handlePayload(payload, this.user)
-    } else if (payload.includes('TARGET_')) {
-      response = await Target.handlePayload(payload, this.user)
-    } else if (payload.includes('START_MENU')) {
-      response = Response.genStartMenu()
+    try {
+      // Set the response based on the payload
+      if (payload === 'LID_MAGNET') {
+        response = LidMagnet.handlePayload(payload)
+      } else if (payload.includes('ANY_')) {
+        response = await AnyMessage.handlePayload(payload, this.user)
+      } else if (payload.includes('CON_')) {
+        response = await Consultation.handlePayload(payload, this.user)
+      } else if (payload.includes('TG_')) {
+        response = await TelegramChat.handlePayload(payload, this.user)
+      } else if (payload.includes('TARGET_')) {
+        response = await Target.handlePayload(payload, this.user)
+      } else if (payload.includes('START_MENU')) {
+        response = Response.genStartMenu()
+      }
+      return response
+    } catch (e) {
+      throw new Error(e)
     }
-    return response
   }
 
   // Handles messages events with text
@@ -146,6 +151,7 @@ module.exports = class Receive {
       } else if (message.includes('start')) {
         response = Response.genStartMenu()
       } else {
+        await notify(this.user.name, message)
         response = Response.genArbitraryMessage()
       }
 

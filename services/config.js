@@ -25,6 +25,9 @@ module.exports = {
   websiteUrl: process.env.IG_APP_URL || 'https://anastasi-target.ru',
   instagramInboxAppId: 1217981644879628,
 
+  telegramBotToken: process.env.TELEGRAM_BOT_TOKEN,
+  telegramChatId: process.env.TELEGRAM_CHAT_ID,
+
   // URL of your app domain. Will be automatically updated.
   appUrl: process.env.APP_URL || '<App URL>',
 
