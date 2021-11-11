@@ -85,6 +85,10 @@ module.exports = class Response {
     ])
   }
 
+  static genStoryReaction() {
+    return this.genText(i18n.__('ig.profile.story_reaction'))
+  }
+
   static genHello(name) {
     const userName = name ? `, ${name}` : ''
     return this.genText(i18n.__('ig.profile.greeting', { userName }))

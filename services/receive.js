@@ -48,6 +48,8 @@ module.exports = class Receive {
           responses = await this.handleQuickReply()
         } else if (message.attachments) {
           responses = this.handleAttachmentMessage()
+        } else if (message?.reply_to?.story) {
+          responses = this.handleReplyToStory()
         } else if (message.text) {
           responses = await this.handleTextMessage()
         } else if (message.is_deleted) {
@@ -190,6 +192,10 @@ module.exports = class Receive {
       )
     }
     return responses
+  }
+
+  handleReplyToStory() {
+    return Response.genStoryReaction()
   }
 
   async sendMessage(response, delay = 0) {

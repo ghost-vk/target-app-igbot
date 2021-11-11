@@ -47,7 +47,9 @@ const start = async () => {
       )
 
       await GraphApi.setPageSubscriptions()
-      await GraphApi.setIcebreakers()
+
+      // uncomment if want to set new icebreakers
+      // await GraphApi.setIcebreakers()
 
       httpsServer.listen(PORT, () => {
         console.log(`Instagram ChatBot HTTPS Server started on port ${PORT} ...`)
