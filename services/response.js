@@ -94,6 +94,10 @@ module.exports = class Response {
     return this.genText(i18n.__('ig.profile.greeting', { userName }))
   }
 
+  static genYouWelcome() {
+    return this.genText(i18n.__('ig.profile.you_welcome'))
+  }
+
   static genGenericTemplate(image_url, title, subtitle, buttons) {
     let response = {
       attachment: {

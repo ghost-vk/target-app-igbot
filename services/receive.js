@@ -144,16 +144,21 @@ module.exports = class Receive {
       let message = this.webhookEvent.message.text.trim().toLowerCase()
       let response
 
-      if (
-        message.includes('материалы') ||
-        message.includes('+') ||
-        message.includes('чек')
-      ) {
+      if (message.includes('спасиб')) {
+        response = Response.genYouWelcome()
+      } else if (message.includes('материалы') || message.includes('+')) {
         response = LidMagnet.handlePayload('LID_MAGNET')
       } else if (message.includes('start')) {
         response = Response.genStartMenu()
       } else {
-        await notify(this.user.name, message)
+        if (!this.user.profilePic) {
+          const profilePic = await GraphApi.getUser(
+            this.user.igsid,
+            'profile_pic'
+          )
+          this.user.setProfilePic(profilePic)
+        }
+        await notify(this.user.name, this.webhookEvent.message.text, this.user.profilePic)
         response = Response.genArbitraryMessage()
       }
 
@@ -194,8 +199,24 @@ module.exports = class Receive {
     return responses
   }
 
-  handleReplyToStory() {
-    return Response.genStoryReaction()
+  async handleReplyToStory() {
+    try {
+      const message = this.webhookEvent.message.text
+      if (message.split(' ').length > 1) {
+        if (!this.user.profilePic) {
+          const profilePic = await GraphApi.getUser(
+            this.user.igsid,
+            'profile_pic'
+          )
+          this.user.setProfilePic(profilePic)
+        }
+        await notify(this.user.name, message, this.user.profilePic)
+      }
+
+      return Response.genStoryReaction()
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   async sendMessage(response, delay = 0) {

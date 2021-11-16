@@ -1,7 +1,8 @@
 const Response = require('./response'),
   i18n = require('./../i18n.config'),
   config = require('./config'),
-  { notify } = require('./telegram-bot')
+  { notify } = require('./telegram-bot'),
+  GraphApi = require('./graph-api')
 
 module.exports = class AnyMessages {
   static async handlePayload(payload, user) {
@@ -29,7 +30,14 @@ module.exports = class AnyMessages {
         )
       }
       case 'ANY_CALL_OPERATOR': {
-        await notify(user.name)
+        if (!user.profilePic) {
+          const profilePic = await GraphApi.getUser(
+            user.igsid,
+            'profile_pic'
+          )
+          user.setProfilePic(profilePic)
+        }
+        await notify(user.name, null, user.profilePic)
         return Response.genText(i18n.__('ig.any.please_waiting'))
       }
       case 'ANY_TRY_CALL_OPERATOR': {

@@ -36,7 +36,8 @@ module.exports = {
           if (users.length > 10) {
             deleteFirstUserInLocalStorage()
           }
-          user = new User(dbResponse.rows[0].igsid)
+          const name = dbResponse.rows[0].name || ''
+          user = new User(dbResponse.rows[0].igsid, name)
           await user.setInterests()
           await user.setThreadOwner()
           await user.setLastEcho()

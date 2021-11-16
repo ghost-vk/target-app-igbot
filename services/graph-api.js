@@ -28,18 +28,21 @@ module.exports = class GraphApi {
     return response
   }
 
-  static async getUserName(senderIgsid) {
+  static async getUser(senderIgsid, fields = 'name') {
     let url = new URL(`${config.apiUrl}/${senderIgsid}`)
     url.search = new URLSearchParams({
       access_token: config.pageAccesToken,
-      fields: 'name',
+      fields,
     })
 
     let response = await fetch(url)
 
     if (response.ok) {
       let userProfile = await response.json()
-      return userProfile.name
+      if (fields.split(',').length > 1) {
+        return userProfile
+      }
+      return userProfile[fields] // only one param
     } else {
       warn(
         `🔴 Could not load profile for ${senderIgsid}: ${response.statusText}`

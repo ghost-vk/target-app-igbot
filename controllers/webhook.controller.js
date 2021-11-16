@@ -79,7 +79,7 @@ class WebhookController {
 
           if (!('igsid' in user)) {
             let newUser = new User(senderIgsid)
-            let userName = await GraphApi.getUserName(senderIgsid)
+            let userName = await GraphApi.getUser(senderIgsid)
             newUser.setName(userName)
             user = await UsersStore.saveNewUser(newUser)
             receive = new Receive(user, webhookEvent)

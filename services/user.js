@@ -3,16 +3,20 @@ const { toArray } = require('./../utils/database-array')
 const { warn } = require('./../utils/log')
 
 module.exports = class User {
-  constructor(igsid) {
+  constructor(igsid, name = '') {
     this.igsid = igsid
-    this.name = ''
+    this.name = name
     this.lastEcho = null
     this.lastIncome = null
     this.isAppThreadOwner = true
     this.interests = []
+    this.profilePic = null
   }
   setName(name) {
     this.name = name
+  }
+  setProfilePic(photo) {
+    this.profilePic = photo
   }
   async saveLastEcho() {
     try {
