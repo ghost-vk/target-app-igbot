@@ -18,10 +18,6 @@ module.exports = class TelegramChat {
             payload: 'TG_LEARN_MORE',
           },
           {
-            title: i18n.__('ig.telegram.want_compare'),
-            payload: 'TG_COMPARE',
-          },
-          {
             title: i18n.__('ig.any.show_reviews'),
             payload: 'TG_REVIEWS',
           },
@@ -36,17 +32,12 @@ module.exports = class TelegramChat {
         return Response.genGenericTemplate(
           `${config.websiteUrl}/public/igbot/telegram.png`,
           'Вступить в чат',
-          'Чтобы вступить в чат нужно оставить заявку на сайте',
+          'Для оплаты требуется пройти несколько простых шагов в нашем Telegram боте',
           [
             {
               type: 'web_url',
-              url: `${config.websiteUrl}?lead_form=true&source=Telegram%20%D1%87%D0%B0%D1%82%20%D1%82%D0%B0%D1%80%D0%B8%D1%84%20PRO%20%28%D0%B8%D0%B7%20%D0%B4%D0%B8%D1%80%D0%B5%D0%BA%D1%82%D0%B0%29`,
-              title: 'Тариф PRO',
-            },
-            {
-              type: 'web_url',
-              url: `${config.websiteUrl}?lead_form=true&source=Telegram%20%D1%87%D0%B0%D1%82%20%D1%82%D0%B0%D1%80%D0%B8%D1%84%20Lite%20%28%D0%B8%D0%B7%20%D0%B4%D0%B8%D1%80%D0%B5%D0%BA%D1%82%D0%B0%29`,
-              title: 'Тариф Lite',
+              url: `https://t.me/at_payment_bot`,
+              title: 'Оплатить',
             },
             {
               type: 'postback',
@@ -60,6 +51,7 @@ module.exports = class TelegramChat {
         await user.saveInterest(interest)
         return [
           Response.genText(i18n.__('ig.telegram.description')),
+          Response.genText(i18n.__('ig.telegram.description_1')),
           Response.genGenericTemplate(
             `${config.websiteUrl}/public/igbot/telegram.png`,
             'Telegram чат',

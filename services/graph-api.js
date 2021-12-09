@@ -44,9 +44,7 @@ module.exports = class GraphApi {
       }
       return userProfile[fields] // only one param
     } else {
-      warn(
-        `🔴 Could not load profile for ${senderIgsid}: ${response.statusText}`
-      )
+      warn(`🔴 Could not load profile for ${senderIgsid}: ${response.statusText}`)
       return null
     }
   }
