@@ -34,12 +34,16 @@ module.exports = class Receive {
         ) {
           await GraphApi.takeThreadControl(this.user.igsid)
           await this.user.saveThreadOwner(true)
+
+          if (wakeUp) {
+            responses = Response.genBotTakeThreadControlMessage()
+          }
         } else {
           return false
         }
       }
 
-      if (event.message) {
+      if (event.message && !responses) {
         let message = event.message
 
         if (message.is_echo) {

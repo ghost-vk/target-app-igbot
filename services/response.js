@@ -51,6 +51,31 @@ module.exports = class Response {
     ])
   }
 
+  static genBotTakeThreadControlMessage() {
+    return this.genQuickReply(i18n.__('ig.any.bot_take_control'), [
+      {
+        title: i18n.__('ig.menu.lid_magnet'),
+        payload: 'LID_MAGNET',
+      },
+      {
+        title: i18n.__('ig.menu.target'),
+        payload: 'TARGET_START',
+      },
+      {
+        title: i18n.__('ig.menu.consultation'),
+        payload: 'CON_START',
+      },
+      {
+        title: i18n.__('ig.menu.telegram_chat'),
+        payload: 'TG_START',
+      },
+      {
+        title: i18n.__('ig.any.call_nastya'),
+        payload: 'ANY_TRY_CALL_OPERATOR',
+      },
+    ])
+  }
+
   static genArbitraryMessage() {
     return this.genQuickReply(i18n.__('ig.any.arbitrary_message'), [
       {
