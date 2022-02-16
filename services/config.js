@@ -1,8 +1,7 @@
-require('dotenv').config()
-const isProduction = process.env.NODE_ENV === 'production'
-const isLocalhost = process.env.PRODUCTION_CLIENT_URL === 'http://localhost'
+const path = require('path')
+require('dotenv').config({ path: path.resolve(__dirname, './../.env') })
+const debug = require('debug')('service:config')
 
-// Required environment variables
 const ENV_VARS = [
   'PAGE_ID',
   'APP_ID',
@@ -12,14 +11,12 @@ const ENV_VARS = [
 ]
 
 module.exports = {
-  // Messenger Platform API
   apiDomain: 'https://graph.facebook.com',
   apiVersion: 'v12.0',
 
-  // Page and Application information
   pageId: process.env.PAGE_ID,
   appId: process.env.APP_ID,
-  pageAccesToken: process.env.PAGE_ACCESS_TOKEN,
+  pageAccessToken: process.env.PAGE_ACCESS_TOKEN,
   appSecret: process.env.APP_SECRET,
   verifyToken: process.env.VERIFY_TOKEN,
   websiteUrl: process.env.IG_APP_URL || 'https://anastasi-target.ru',
@@ -27,19 +24,16 @@ module.exports = {
 
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN,
   telegramChatId: process.env.TELEGRAM_CHAT_ID,
+  telegramTechChatId: process.env.TELEGRAM_TECH_CHAT_ID,
 
-  // URL of your app domain. Will be automatically updated.
   appUrl: process.env.APP_URL || '<App URL>',
 
-  // Preferred port
   port: process.env.IG_CHATBOT_PORT || 8443,
 
-  // Base URL for Messenger Platform API calls
   get apiUrl() {
     return `${this.apiDomain}/${this.apiVersion}`
   },
 
-  // URL of webhook endpoint
   get webhookUrl() {
     return `${this.appUrl}/webhook`
   },
@@ -47,7 +41,7 @@ module.exports = {
   checkEnvVariables() {
     ENV_VARS.forEach((key) => {
       if (!process.env[key]) {
-        console.warn(`WARNING: Missing required environment variable ${key}`)
+        debug('WARNING: Missing required environment variable %s', key)
       }
     })
   },

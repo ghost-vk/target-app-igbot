@@ -1,13 +1,19 @@
 const i18n = require('./../i18n.config')
 const GraphApi = require('./graph-api')
 const Response = require('./response')
-const LidMagnet = require('./lidmagnet')
+const Answer = require('./answer')
 const AnyMessage = require('./any-messages')
-const Consultation = require('./consultation')
-const TelegramChat = require('./telegram')
-const Target = require('./target')
-const { log, warn } = require('./../utils/log')
+const debug = require('debug')('service:receive')
 const { notify } = require('./telegram-bot')
+const sleep = require('./../utils/sleep')
+const db = require('../db')
+const { quiet } = require('nodemon/lib/utils')
+
+/**
+ * @typedef {object} TextNeedleRow
+ * @property {string} needle
+ * @property {string} payload
+ */
 
 module.exports = class Receive {
   constructor(user, webhookEvent) {
@@ -18,25 +24,28 @@ module.exports = class Receive {
   async handleMessage() {
     let event = this.webhookEvent
     let responses
+
     try {
-      // app isn't owner of thread
       await this.user.saveLastIncome()
+
       if (!this.user.isAppThreadOwner) {
         let wakeUp = false
+
         if (event?.message?.text?.trim().toLowerCase().includes('bot')) {
           wakeUp = true
         }
+
         // let app take the thread control after 30 minutes or get message 'bot'
-        if (
-          Math.abs((this.user.lastEcho - this.user.lastIncome) / 1000 / 60) >
-            30 ||
-          wakeUp
-        ) {
+        const isAfter30Minutes =
+          Math.abs((this.user.lastEcho - this.user.lastIncome) / 1000 / 60) > 30
+
+        if (isAfter30Minutes || wakeUp) {
           await GraphApi.takeThreadControl(this.user.igsid)
+
           await this.user.saveThreadOwner(true)
 
           if (wakeUp) {
-            responses = Response.genBotTakeThreadControlMessage()
+            responses = await Response.genBotTakeThreadControlMessage()
           }
         } else {
           return false
@@ -73,7 +82,7 @@ module.exports = class Receive {
 
       if (Array.isArray(responses)) {
         for (let response of responses) {
-          await this.sendMessage(response, 1800)
+          await this.sendMessage(response, 1500)
         }
       } else {
         await this.sendMessage(responses)
@@ -81,101 +90,151 @@ module.exports = class Receive {
 
       return true
     } catch (e) {
-      warn(['🔴 Error on message handling', e])
+      debug('🔴 Error on message handling:\n%O', e)
+
       responses = Response.genText(
         `Произошла ошибка, в скором времени мы ее устраним!`
       )
+
       await this.sendMessage(responses)
+
       return true
     }
   }
 
-  // Handle message events with quick replies
   async handleQuickReply() {
     try {
-      // Get the payload of the quick reply
-      let payload = this.webhookEvent?.message?.quick_reply?.payload
-      const responses = await this.handlePayload(payload)
+      const responses = await this.handlePayload(
+        this.webhookEvent?.message?.quick_reply?.payload?.toUpperCase()
+      )
+
       return responses
     } catch (e) {
-      warn('🔴 Error when handling message with quick replies')
+      debug('🔴 Error when handling message with quick replies:\n%O', e)
+
+      throw new Error(e)
     }
   }
 
   async handlePostback() {
     try {
-      const responses = await this.handlePayload(
+      return await this.handlePayload(
         this.webhookEvent.postback.payload.toUpperCase()
       )
-      return responses
     } catch (e) {
-      warn('🔴 Error when handling message with postback')
+      debug('🔴 Error when handling message with postback', e)
     }
   }
 
   async handlePayload(payload) {
-    log(`🔵 Received Payload: ${payload} for user ${this.user.igsid}`)
-    let response
+    debug('🔵 Received Payload: "%s".', payload)
+    debug('For user: %s', this.user.igsid)
+
     try {
-      // Set the response based on the payload
-      if (payload === 'LID_MAGNET') {
-        response = LidMagnet.handlePayload(payload)
-      } else if (payload.includes('ANY_')) {
-        response = await AnyMessage.handlePayload(payload, this.user)
-      } else if (payload.includes('CON_')) {
-        response = await Consultation.handlePayload(payload, this.user)
-      } else if (payload.includes('TG_')) {
-        response = await TelegramChat.handlePayload(payload, this.user)
-      } else if (payload.includes('TARGET_')) {
-        response = await Target.handlePayload(payload, this.user)
-      } else if (payload.includes('START_MENU')) {
-        response = Response.genStartMenu()
+      if (payload.includes('ANY_')) {
+        return await AnyMessage.handlePayload(payload, this.user)
       }
-      return response
+
+      const answer = new Answer(payload)
+      const fetched = await answer.getAnswerByPayload()
+
+      return fetched.answer
     } catch (e) {
       throw new Error(e)
     }
   }
 
-  // Handles messages events with text
   async handleTextMessage() {
     try {
-      log([
-        `🔵 Received text from user '${this.user.name}' (${this.user.igsid}):`,
-        this.webhookEvent.message.text,
-      ])
+      debug('🔵 Received text from User.\nUsername: %s', this.user.name)
+      debug('IGSID: %s\n', this.user.igsid)
+      debug('Text: %s', this.webhookEvent.message.text)
 
-      let message = this.webhookEvent.message.text.trim().toLowerCase()
-      let response
+      const message = this.webhookEvent.message.text.trim().toLowerCase()
 
-      if (message.includes('спасиб')) {
-        response = Response.genYouWelcome()
-      } else if (message.includes('материалы') || message.includes('+')) {
-        response = LidMagnet.handlePayload('LID_MAGNET')
-      } else if (message.includes('start')) {
-        response = Response.genStartMenu()
-      } else {
-        if (!this.user.profilePic) {
-          const profilePic = await GraphApi.getUser(
-            this.user.igsid,
-            'profile_pic'
-          )
-          this.user.setProfilePic(profilePic)
+      // content only for followers
+      if (message.startsWith('#')) {
+        const isUserFollowBusiness = await GraphApi.getUser(
+          this.user.igsid,
+          'is_user_follow_business'
+        )
+
+        if (!isUserFollowBusiness) {
+          debug('🔵 User not follow business', isUserFollowBusiness)
+
+          const answer = new Answer('ONLY_FOR_FOLLOWERS')
+          const fetched = await answer.getAnswerByPayload()
+
+          return fetched.answer
         }
-        await notify(this.user.name, this.webhookEvent.message.text, this.user.profilePic)
-        response = Response.genArbitraryMessage()
       }
 
-      return response
+      let response
+
+      /**
+       * @type {object}
+       * @property {TextNeedleRow[]} rows
+       */
+      const dbResponse = await db.query('SELECT * FROM text_needles')
+
+      if (dbResponse.rows.length > 0) {
+        let row
+        for (row of dbResponse.rows) {
+          const needles = row.needle.split('|')
+
+          let pattern
+
+          for (pattern of needles) {
+            // strict
+            if (message.includes('#') && message.includes(pattern)) {
+              if (message === pattern) {
+                const answer = new Answer(row.payload)
+                const fetched = await answer.getAnswerByPayload()
+
+                return fetched.answer
+              }
+            } else if (message.includes(pattern)) {
+              const answer = new Answer(row.payload)
+              const fetched = await answer.getAnswerByPayload()
+
+              return fetched.answer
+            }
+          }
+        }
+      }
+
+      if (message.includes('start')) {
+        return await Response.genStartMenu()
+      }
+
+      if (!this.user.profilePic) {
+        const profilePic = await GraphApi.getUser(
+          this.user.igsid,
+          'profile_pic'
+        )
+
+        this.user.setProfilePic(profilePic)
+      }
+
+      await notify(
+        this.user.name,
+        this.webhookEvent.message.text,
+        this.user.profilePic
+      )
+
+      return Response.genArbitraryMessage()
     } catch (e) {
-      warn(['❌ Error in handling text message', e])
+      debug('❌ Error in handling text message: %O', e)
+
+      throw new Error(e)
     }
   }
 
   handleAttachmentMessage() {
-    let responses = []
+    const responses = []
     let isStoryMention = false
     let isAnyFile = false
+
     this.webhookEvent.message.attachments.forEach((a) => {
       if (a.type === 'story_mention') {
         isStoryMention = true
@@ -183,9 +242,11 @@ module.exports = class Receive {
         isAnyFile = true
       }
     })
+
     if (isStoryMention) {
       responses.push(Response.genText(i18n.__('ig.any.thanks_story_mention')))
     }
+
     if (isAnyFile) {
       responses.push(
         Response.genQuickReply(i18n.__('ig.any.fallback_attachment'), [
@@ -200,41 +261,48 @@ module.exports = class Receive {
         ])
       )
     }
+
     return responses
   }
 
   async handleReplyToStory() {
     try {
       const message = this.webhookEvent.message.text
+
       if (message.split(' ').length > 1) {
         if (!this.user.profilePic) {
           const profilePic = await GraphApi.getUser(
             this.user.igsid,
             'profile_pic'
           )
+
           this.user.setProfilePic(profilePic)
         }
+
         await notify(this.user.name, message, this.user.profilePic)
       }
 
       return Response.genStoryReaction()
     } catch (e) {
-      console.error(e)
+      debug('Error when handle reply to story, %O', e)
+
+      throw new Error(e)
     }
   }
 
   async sendMessage(response, delay = 0) {
     try {
       if (!response) {
-        log('🔵 No response from app. Maybe app pass control to IG inbox.')
+        debug('🔵 No response from app. Maybe app pass control to IG inbox.')
+
         return false
       }
-      // Check if there is delay in the response
+
       if ('delay' in response) {
         delay = response['delay']
         delete response['delay']
       }
-      // Construct the message body
+
       let requestBody = {
         recipient: { id: this.user.igsid },
         message: response,
@@ -242,26 +310,29 @@ module.exports = class Receive {
 
       await this.callApi(requestBody, delay)
     } catch (e) {
-      warn([`❌ Error when send message to user: ${this.user.igsid}`, e])
+      debug('❌ Send message to User.\nIGSID: %s', this.user.igsid)
+      debug('Error:\n%O', e)
+
       throw new Error(e)
     }
   }
 
   async callApi(requestBody, delay) {
-    return new Promise((resolve, reject) => {
-      try {
-        setTimeout(async () => {
-          await GraphApi.callSendApi(requestBody)
-          await this.user.saveLastEcho()
-          if (requestBody?.message?.text === i18n.__('ig.any.please_waiting')) {
-            await GraphApi.passThreadControl(this.user.igsid)
-            await this.user.saveThreadOwner(false)
-          }
-          resolve(true)
-        }, delay)
-      } catch (e) {
-        throw new Error(e)
+    try {
+      await GraphApi.callSendApi(requestBody)
+
+      await this.user.saveLastEcho()
+
+      if (requestBody?.message?.text === i18n.__('ig.any.please_waiting')) {
+        await GraphApi.passThreadControl(this.user.igsid)
+        await this.user.saveThreadOwner(false)
       }
-    })
+
+      await sleep(delay)
+
+      return true
+    } catch (e) {
+      throw new Error(e)
+    }
   }
 }

@@ -1,6 +1,7 @@
-require('dotenv').config()
 const Pool = require('pg').Pool
-const isDev = process.env.NODE_ENV === 'dev'
+
+const isDev = process.env.NODE_ENV === 'development'
+
 const pool = new Pool({
   user: isDev ? process.env.LOCAL_DB_USER : process.env.REMOTE_DB_USER,
   password: isDev

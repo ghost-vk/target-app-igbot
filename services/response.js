@@ -1,4 +1,7 @@
 const i18n = require('../i18n.config')
+const db = require('./../db')
+const debug = require('debug')('service:response')
+const Answer = require('./answer')
 
 module.exports = class Response {
   static genQuickReply(text, quickReplies) {
@@ -26,54 +29,31 @@ module.exports = class Response {
     return response
   }
 
-  static genStartMenu() {
-    return this.genQuickReply('Выбери интересующий вопрос 👇', [
-      {
-        title: i18n.__('ig.menu.target'),
-        payload: 'TARGET_START',
-      },
-      {
-        title: i18n.__('ig.menu.consultation'),
-        payload: 'CON_START',
-      },
-      {
-        title: i18n.__('ig.menu.telegram_chat'),
-        payload: 'TG_START',
-      },
-      {
-        title: i18n.__('ig.menu.lid_magnet'),
-        payload: 'LID_MAGNET',
-      },
-      {
-        title: i18n.__('ig.any.call_nastya'),
-        payload: 'ANY_TRY_CALL_OPERATOR',
-      },
-    ])
+  static async genStartMenu() {
+    try {
+      const answer = new Answer('START_MENU')
+
+      const fetched = await answer.getAnswerByPayload()
+
+      return fetched.answer
+    } catch (e) {
+      debug('Error when generating start menu markup:\n%O', e)
+      throw new Error(e)
+    }
   }
 
-  static genBotTakeThreadControlMessage() {
-    return this.genQuickReply(i18n.__('ig.any.bot_take_control'), [
-      {
-        title: i18n.__('ig.menu.lid_magnet'),
-        payload: 'LID_MAGNET',
-      },
-      {
-        title: i18n.__('ig.menu.target'),
-        payload: 'TARGET_START',
-      },
-      {
-        title: i18n.__('ig.menu.consultation'),
-        payload: 'CON_START',
-      },
-      {
-        title: i18n.__('ig.menu.telegram_chat'),
-        payload: 'TG_START',
-      },
-      {
-        title: i18n.__('ig.any.call_nastya'),
-        payload: 'ANY_TRY_CALL_OPERATOR',
-      },
-    ])
+  static async genBotTakeThreadControlMessage() {
+    try {
+      const menuMarkup = await this.genStartMenu()
+
+      return [
+        this.genText(i18n.__('ig.any.bot_take_control')),
+        menuMarkup
+      ]
+    } catch (e) {
+      debug('Error when generating bot take control message:\n%O', e)
+      throw new Error(e)
+    }
   }
 
   static genArbitraryMessage() {
@@ -114,17 +94,12 @@ module.exports = class Response {
     return this.genText(i18n.__('ig.profile.story_reaction'))
   }
 
-  static genHello(name) {
-    const userName = name ? `, ${name}` : ''
-    return this.genText(i18n.__('ig.profile.greeting', { userName }))
-  }
-
-  static genYouWelcome() {
-    return this.genText(i18n.__('ig.profile.you_welcome'))
+  static genHello() {
+    return this.genText(i18n.__('ig.profile.greeting'))
   }
 
   static genGenericTemplate(image_url, title, subtitle, buttons) {
-    let response = {
+    return {
       attachment: {
         type: 'template',
         payload: {
@@ -140,7 +115,5 @@ module.exports = class Response {
         },
       },
     }
-
-    return response
   }
 }

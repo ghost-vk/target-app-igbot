@@ -11,6 +11,7 @@ const http = require('http')
 const https = require('https')
 const fs = require('fs')
 const PORT = process.env.IG_CHATBOT_PORT || 8443
+const debug = require('debug')('app')
 
 app.use(urlencoded({ extended: true }))
 
@@ -22,15 +23,17 @@ app.use(errorMiddleware)
 
 const start = async () => {
   try {
-    // http
     if (!isProduction) {
       const httpServer = http.createServer(app)
+
       await GraphApi.setPageSubscriptions()
+
       // await GraphApi.setIcebreakers()
+
       httpServer.listen(PORT, () => {
-        console.log(`Instagram ChatBot HTTP Server started on port ${PORT} ...`)
+        debug('Instagram ChatBot HTTP Server started on port %s ...', PORT)
       })
-    } else { // https
+    } else {
       const httpsServer = https.createServer(
         {
           key: fs.readFileSync(
@@ -48,15 +51,14 @@ const start = async () => {
 
       await GraphApi.setPageSubscriptions()
 
-      // uncomment if want to set new icebreakers
-      // await GraphApi.setIcebreakers()
+      await GraphApi.setIcebreakers()
 
       httpsServer.listen(PORT, () => {
-        console.log(`Instagram ChatBot HTTPS Server started on port ${PORT} ...`)
+        debug('Instagram ChatBot HTTPS Server started on port %s ...', PORT)
       })
     }
   } catch (err) {
-    console.warn(err)
+    debug('Error when start App:\n%O', err)
   }
 }
 start()

@@ -1,0 +1,578 @@
+{
+  "START_MENU": {
+    "type": "quick_reply",
+    "data": {
+      "text": "Выбери интересующий вопрос \uD83D\uDC47",
+      "quick_replies": [
+        {
+          "title": "Запуск рекламы",
+          "payload": "TARGET_START"
+        },
+        {
+          "title": "Консультация",
+          "payload": "CON_START"
+        },
+        {
+          "title": "Кейсы",
+          "payload": "TARGET_CASES"
+        },
+        {
+          "title": "Отзывы",
+          "payload": "TARGET_REVIEWS"
+        },
+        {
+          "title": "Позвать Настю",
+          "payload": "ANY_TRY_CALL_OPERATOR"
+        }
+      ]
+    }
+  },
+
+  "BOT_TAKE_CONTROL": {
+    "type": "quick_reply",
+    "data": {
+      "text": "Теперь бот-помощник контролирует диалог, для взаимодействия используйте меню \uD83D\uDC47",
+      "quick_replies": [
+        {
+          "title": "Запуск рекламы",
+          "payload": "TARGET_START"
+        },
+        {
+          "title": "Консультация",
+          "payload": "CON_START"
+        },
+        {
+          "title": "Позвать Настю \uD83D\uDC40",
+          "payload": "ANY_TRY_CALL_OPERATOR"
+        }
+      ]
+    }
+  },
+
+  "ARBITRARY_MESSAGE": {
+    "type": "quick_reply",
+    "data": {
+      "text": "Спасибо за сообщение. Настя сейчас занята и ответит как будет свободное время. Но если у вас что-то срочное, то рекомендую оставить заявку \uD83D\uDC47\nВаш бот помощник \uD83D\uDE09",
+      "quick_replies": [
+        {
+          "title": "Оставить заявку ✅",
+          "payload": "ANY_GEN_LEAD"
+        },
+        {
+          "title": "Позвать Настю \uD83D\uDC40",
+          "payload": "ANY_CALL_OPERATOR"
+        },
+        {
+          "title": "Показать меню \uD83E\uDD14",
+          "payload": "START_MENU"
+        }
+      ]
+    }
+  },
+
+  "STORY_REACTION": {
+    "type": "text",
+    "data": {
+      "text": "Спасибо за обратную связь \uD83D\uDE09"
+    }
+  },
+
+  "HELLO_MESSAGE": {
+    "type": "text",
+    "data": {
+      "text": "Здравствуйте! Добро пожаловать на мою страницу, надеюсь здесь Вы найдете много нового и полезного ✨"
+    }
+  },
+
+  "YOU_WELCOME": {
+    "type": "text",
+    "data": {
+      "text": "Ваша признательность меня вдохновляет \uD83D\uDE0D"
+    }
+  },
+
+  "CON_START": {
+    "type": "quick_reply",
+    "data": {
+      "text": "Выбери действие \uD83D\uDC47",
+      "quick_replies": [
+        {
+          "title": "Записаться",
+          "payload": "CON_GET_CONSULTATION"
+        },
+        {
+          "title": "Узнать подробнее",
+          "payload": "CON_LEARN_MORE"
+        },
+        {
+          "title": "Посмотреть отзывы",
+          "payload": "CON_SHOW_REVIEWS"
+        },
+        {
+          "title": "Задать вопрос",
+          "payload": "CON_ASK_QUESTION"
+        },
+        {
+          "title": "Обратно в меню",
+          "payload": "START_MENU"
+        }
+      ]
+    }
+  },
+
+  "CON_GET_CONSULTATION": {
+    "type": "generic_template",
+    "data": {
+      "title": "Оставьте заявку",
+      "subtitle": "Стоимость консультации можно узнать на сайте",
+      "image_url": "https://anastasi-target.ru/public/igbot/consultation.png",
+      "buttons": [
+        {
+          "type": "web_url",
+          "url": "https://anastasi-target.ru?lead_form=true&source=InstagramDirectGetConsultation",
+          "title": "Получить консультацию"
+        },
+        {
+          "type": "postback",
+          "title": "Продолжить чат",
+          "payload": "CON_START"
+        }
+      ]
+    }
+  },
+
+  "CON_LEARN_MORE": [
+    {
+      "type": "text",
+      "data": {
+        "text": "Настя проводит консультации для таргетологов и предпринимателей, у которых есть вопросы по таргетированной рекламе"
+      }
+    },
+    {
+      "type": "text",
+      "data": {
+        "text": "Также на консультации Настя может подключиться к вашему ПК через удаленный доступ и прямо на вашем мониторе решить проблему"
+      }
+    },
+    {
+      "type": "text",
+      "data": {
+        "text": "Бонус:\n\uD83C\uDF81 Подробный документ с секретами и лайфхаками по эффективным запускам рекламной кампании\n\uD83C\uDF81\uD83C\uDF81 Обратная связь в течение 5-ти дней после консультации"
+      }
+    },
+    {
+      "type": "generic_template",
+      "data": {
+        "title": "Консультация",
+        "subtitle": "Записаться на консультацию можно на сайте",
+        "image_url": "https://anastasi-target.ru/public/igbot/consultation.png",
+        "buttons": [
+          {
+            "type": "web_url",
+            "url": "https://anastasi-target.ru?lead_form=true&source=InstagramDirectGetConsultation",
+            "title": "Оставить заявку"
+          },
+          {
+            "type": "web_url",
+            "url": "https://anastasi-target.ru/service?price=consultation&show_node=at_price",
+            "title": "Узнать стоимость"
+          },
+          {
+            "type": "postback",
+            "title": "Продолжить чат",
+            "payload": "CON_START"
+          }
+        ]
+      }
+    }
+  ],
+
+  "CON_ASK_QUESTION": {
+    "type": "quick_reply",
+    "data": {
+      "text": "Вкратце расскажу о консультации, не против?",
+      "quick_replies": [
+        {
+          "title": "Рассказывай \uD83D\uDE09",
+          "payload": "CON_LEARN_MORE"
+        },
+        {
+          "title": "Задать вопрос",
+          "payload": "CON_FORCE_QUESTION"
+        }
+      ]
+    }
+  },
+
+  "CON_FORCE_QUESTION": [
+    {
+      "type": "text",
+      "data": {
+        "text": "К сожалению, директ в Instagram просто переполнен.\n\nТак что мне приходится помогать \uD83E\uDD16\n\nВы можете оставить заявку на сайте, это самый быстрый способ обратной связи."
+      }
+    },
+    {
+      "type": "generic_template",
+      "data": {
+        "title": "Задать вопрос",
+        "subtitle": "Оставьте заявку на сайте, вам быстро ответят",
+        "image_url": "https://anastasi-target.ru/public/igbot/consultation.png",
+        "buttons": [
+          {
+            "type": "web_url",
+            "url": "https://anastasi-target.ru?lead_form=true&source=InstagramDirectConsultationQuestion",
+            "title": "Оставить заявку"
+          },
+          {
+            "type": "postback",
+            "title": "Продолжить чат",
+            "payload": "CON_START"
+          }
+        ]
+      }
+    }
+  ],
+
+  "CON_SHOW_REVIEWS": {
+    "type": "generic_template",
+    "data": {
+      "title": "Отзывы",
+      "subtitle": "Ознакомьтесь с отзывами тех, кто уже прошел консультацию",
+      "image_url": "https://anastasi-target.ru/public/igbot/consultation.png",
+      "buttons": [
+        {
+          "type": "web_url",
+          "url": "https://anastasi-target.ru?reviews_category=consultation&show_node=at_reviews",
+          "title": "Посмотреть отзывы"
+        },
+        {
+          "type": "postback",
+          "title": "Продолжить чат",
+          "payload": "CON_START"
+        }
+      ]
+    }
+  },
+
+  "TARGET_START": [
+    {
+      "type": "quick_reply",
+      "data": {
+        "text": "Выбери действие \uD83D\uDC47",
+        "quick_replies": [
+          {
+            "title": "Оставить заявку",
+            "payload": "TARGET_LEAD"
+          },
+          {
+            "title": "Посмотреть отзывы",
+            "payload": "TARGET_REVIEWS"
+          },
+          {
+            "title": "Посмотреть кейсы",
+            "payload": "TARGET_CASES"
+          },
+          {
+            "title": "Подробнее",
+            "payload": "TARGET_LEARN_MORE"
+          },
+          {
+            "title": "Процесс работы",
+            "payload": "TARGET_STEPS"
+          },
+          {
+            "title": "Задать вопрос",
+            "payload": "ANY_TRY_CALL_OPERATOR"
+          },
+          {
+            "title": "Обратно в меню",
+            "payload": "START_MENU"
+          }
+        ]
+      }
+    }
+  ],
+
+  "TARGET_LEAD": {
+    "type": "generic_template",
+    "data": {
+      "title": "Настройка рекламы",
+      "subtitle": "Таргетированная реклама в Facebook/Instagram от эксперта",
+      "image_url": "https://anastasi-target.ru/public/igbot/target.png",
+      "buttons": [
+        {
+          "type": "web_url",
+          "url": "https://anastasi-target.ru?lead_form=true&source=InstagramDirectOrderTarget",
+          "title": "Оставить заявку"
+        },
+        {
+          "type": "postback",
+          "title": "Продолжить чат",
+          "payload": "TARGET_START"
+        }
+      ]
+    }
+  },
+
+  "TARGET_REVIEWS": {
+    "type": "generic_template",
+    "data": {
+      "title": "Отзывы",
+      "subtitle": "Ознакомьтесь с отзывами тех, кто уже запускал рекламу с Настей",
+      "image_url": "https://anastasi-target.ru/public/igbot/target.png",
+      "buttons": [
+        {
+          "type": "web_url",
+          "url": "https://anastasi-target.ru?reviews_category=target-setup&show_node=at_reviews",
+          "title": "Посмотреть отзывы"
+        },
+        {
+          "type": "postback",
+          "title": "Продолжить чат",
+          "payload": "TARGET_START"
+        }
+      ]
+    }
+  },
+
+  "TARGET_CASES": {
+    "type": "generic_template",
+    "data": {
+      "title": "Кейсы",
+      "subtitle": "Ознакомьтесь с кейсами на сайте",
+      "image_url": "https://anastasi-target.ru/public/igbot/target.png",
+      "buttons": [
+        {
+          "type": "web_url",
+          "url": "https://anastasi-target.ru/cases",
+          "title": "Посмотреть кейсы"
+        },
+        {
+          "type": "postback",
+          "title": "Продолжить чат",
+          "payload": "TARGET_START"
+        }
+      ]
+    }
+  },
+
+  "TARGET_LEARN_MORE": [
+    {
+      "type": "text",
+      "data": {
+        "text": "Таргетированная реклама сейчас это почти необходимость для бизнеса в Instagram. Многие из старых схем накруток трафика в аккаунте больше не работают, остается лишь таргет и реклама у блогеров."
+      }
+    },
+    {
+      "type": "text",
+      "data": {
+        "text": "Выбрать блогера для рекламы совсем не просто, да и угадать с тем, насколько реклама понравится аудитории, к сожалению не выйдет."
+      }
+    },
+    {
+      "type": "text",
+      "data": {
+        "text": "В таргетированной рекламе все иначе: можно проанализировать как аудитория реагирует на рекламу, оптимизировать ее, изменить цели и вообще полностью перестроить. Бюджет списывается равномерно, это тоже удобно."
+      }
+    },
+    {
+      "type": "text",
+      "data": {
+        "text": "В итоге получаем что сейчас это относительно недорогой и рациональный способ привлечь клиентов и подписчиков."
+      }
+    },
+    {
+      "type": "generic_template",
+      "data": {
+        "title": "Настройка рекламы",
+        "subtitle": "Таргетированная реклама в Facebook/Instagram от эксперта",
+        "image_url": "https://anastasi-target.ru/public/igbot/target.png",
+        "buttons": [
+          {
+            "type": "web_url",
+            "url": "https://anastasi-target.ru?lead_form=true&source=InstagramDirectOrderTarget",
+            "title": "Оставить заявку"
+          },
+          {
+            "type": "postback",
+            "title": "Этапы запуска рекламы",
+            "payload": "TARGET_STEPS"
+          },
+          {
+            "type": "postback",
+            "title": "Продолжить чат",
+            "payload": "TARGET_START"
+          }
+        ]
+      }
+    }
+  ],
+
+  "TARGET_STEPS": [
+    {
+      "type": "text",
+      "data": {
+        "text": "1) Созвониться чтобы быстро обсудить детали проекта\n2) Настя отправляет 2 брифа, Вам их необходимо заполнить\n3) Вы вносите оплату за настройку рекламы\n4) Далее Настя разрабатывает рекламную стратегию, подготавливает офферы и макеты, согласовывая с вами\n5) Поиск рабочей комбинации оффера и макета, тесты\n6) Анализ и масштабирование рекламной кампании"
+      }
+    },
+    {
+      "type": "generic_template",
+      "data": {
+        "title": "Настройка рекламы",
+        "subtitle": "Таргетированная реклама в Facebook/Instagram от эксперта",
+        "image_url": "https://anastasi-target.ru/public/igbot/target.png",
+        "buttons": [
+          {
+            "type": "web_url",
+            "url": "https://anastasi-target.ru?lead_form=true&source=InstagramDirectOrderTarget",
+            "title": "Оставить заявку"
+          },
+          {
+            "type": "postback",
+            "title": "Продолжить чат",
+            "payload": "TARGET_START"
+          }
+        ]
+      }
+    }
+  ],
+
+  "ONLY_FOR_FOLLOWERS": {
+    "type": "quick_reply",
+    "data": {
+      "text": "Доступно только моим подсписчикам 🤫\nПодпишись, это ведь не сложно)",
+      "quick_replies": [
+        {
+          "title": "Показать меню",
+          "payload": "START_MENU"
+        }
+      ]
+    }
+  },
+
+  "FIGMA_LESSON": {
+    "type": "generic_template",
+    "data": {
+      "title": "Видео-урок",
+      "subtitle": "Создание макетов в Figma",
+      "image_url": "https://anastasi-target.ru/public/uploads/img/figma-1645021114955.png",
+      "buttons": [
+        {
+          "type": "web_url",
+          "url": "https://drive.google.com/drive/folders/1FemlI2OU57iQOHbeE7x0v7dAqRuLv7kV?usp=sharing",
+          "title": "Получить"
+        },
+        {
+          "type": "postback",
+          "title": "Продолжить чат",
+          "payload": "START_MENU"
+        }
+      ]
+    }
+  },
+
+  "AUDIENCE_SUBTRACTION": {
+    "type": "generic_template",
+    "data": {
+      "title": "Видео-урок",
+      "subtitle": "Как из одной аудитории вычесть другую и избежать конкуренции?",
+      "image_url": "https://anastasi-target.ru/public/uploads/img/subtraction-1645020643350.png",
+      "buttons": [
+        {
+          "type": "web_url",
+          "url": "https://youtu.be/hszqXP28jRo",
+          "title": "Посмотреть"
+        },
+        {
+          "type": "postback",
+          "title": "Продолжить чат",
+          "payload": "START_MENU"
+        }
+      ]
+    }
+  },
+
+  "HOW_TO_CALC_AD_BUDGET": {
+    "type": "generic_template",
+    "data": {
+      "title": "Документ",
+      "subtitle": "Как рассчитать бюджет на рекламу?",
+      "image_url": "https://anastasi-target.ru/public/uploads/img/adcalc-1645021708251.png",
+      "buttons": [
+        {
+          "type": "web_url",
+          "url": "https://docs.google.com/document/d/1Yl6w-1q1cxBJLQ99ogY89L9UMHQm1oZnkoInueKjEUI/edit?usp=sharing",
+          "title": "Открыть"
+        },
+        {
+          "type": "postback",
+          "title": "Продолжить чат",
+          "payload": "START_MENU"
+        }
+      ]
+    }
+  },
+
+  "IDEAS_BANK": {
+    "type": "generic_template",
+    "data": {
+      "title": "Банк идей",
+      "subtitle": "Идеи для создания макетов для различных ниш",
+      "image_url": "https://anastasi-target.ru/public/uploads/img/bank-1645023626877.png",
+      "buttons": [
+        {
+          "type": "web_url",
+          "url": "https://drive.google.com/drive/folders/1RGrNOKyyjf6LoY5hsdDrg9dEz8GZs_w-?usp=sharing",
+          "title": "Открыть"
+        },
+        {
+          "type": "postback",
+          "title": "Продолжить чат",
+          "payload": "START_MENU"
+        }
+      ]
+    }
+  },
+
+  "HOW_TO_DEAL": {
+    "type": "generic_template",
+    "data": {
+      "title": "Чек-лист",
+      "subtitle": "Как закрыть клиента на сделку?",
+      "image_url": "https://anastasi-target.ru/public/uploads/img/deal-1645024023136.png",
+      "buttons": [
+        {
+          "type": "web_url",
+          "url": "https://docs.google.com/document/d/11uYSo9qnljyMDv04XarG27uj1OiR8FEupHnz7i4SvzA/edit?usp=sharing",
+          "title": "Открыть"
+        },
+        {
+          "type": "postback",
+          "title": "Продолжить чат",
+          "payload": "START_MENU"
+        }
+      ]
+    }
+  },
+
+  "SEARCH_CLIENTS": {
+    "type": "generic_template",
+    "data": {
+      "title": "Материал",
+      "subtitle": "Где искать клиентов таргетологу?",
+      "image_url": "https://anastasi-target.ru/public/uploads/img/search-1645024235544.png",
+      "buttons": [
+        {
+          "type": "web_url",
+          "url": "https://docs.google.com/document/d/11a0rdXqyrVMqlZQysqDBdhz4ctcXT9jKlOLPC8j58Lg/edit?usp=sharing",
+          "title": "Открыть"
+        },
+        {
+          "type": "postback",
+          "title": "Продолжить чат",
+          "payload": "START_MENU"
+        }
+      ]
+    }
+  }
+}

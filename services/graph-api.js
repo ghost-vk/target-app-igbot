@@ -2,66 +2,83 @@ const { URL, URLSearchParams } = require('url')
 const fetch = require('node-fetch')
 const i18n = require('./../i18n.config')
 const config = require('./config')
-const { log, warn } = require('./../utils/log')
+const debug = require('debug')('service:graph-api')
 
 module.exports = class GraphApi {
   static async callSendApi(requestBody) {
     if (!requestBody) {
-      warn(`🔴 no requestBody in callSendApi`)
+      debug('🔴 no requestBody in callSendApi')
       return false
     }
-    let url = new URL(`${config.apiUrl}/me/messages`)
+
+    const url = new URL(`${config.apiUrl}/me/messages`)
+
     url.search = new URLSearchParams({
-      access_token: config.pageAccesToken,
+      access_token: config.pageAccessToken,
     })
-    log([`🔵 Send request to url: ${url}`, `Body: ${requestBody}`])
-    let response = await fetch(url, {
+
+    debug('🔵 Send request to url: %s', url)
+    debug('Body: %O', requestBody)
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestBody),
     })
+
     if (!response.ok) {
-      warn([`🔴 Could not sent message.`, response.statusText, response])
+      debug('🔴 Could not sent message. Response: %O', response)
     } else {
-      log(`🟢 Get ok response: ${response}`)
+      debug('🟢 Get ok response: %O', response)
     }
+
     return response
   }
 
   static async getUser(senderIgsid, fields = 'name') {
-    let url = new URL(`${config.apiUrl}/${senderIgsid}`)
+    const url = new URL(`${config.apiUrl}/${senderIgsid}`)
+
     url.search = new URLSearchParams({
-      access_token: config.pageAccesToken,
+      access_token: config.pageAccessToken,
       fields,
     })
 
-    let response = await fetch(url)
+    const response = await fetch(url)
 
     if (response.ok) {
-      let userProfile = await response.json()
+      const userProfile = await response.json()
+
       if (fields.split(',').length > 1) {
         return userProfile
       }
+
       return userProfile[fields] // only one param
     } else {
-      warn(`🔴 Could not load profile for ${senderIgsid}: ${response.statusText}`)
+      debug('🔴 Could not load profile for %s', senderIgsid)
+      debug('Status: %s', response.statusText)
+
       return null
     }
   }
 
   static async setPageSubscriptions() {
-    let url = new URL(`${config.apiUrl}/${config.pageId}/subscribed_apps`)
+    const url = new URL(`${config.apiUrl}/${config.pageId}/subscribed_apps`)
+
     url.search = new URLSearchParams({
-      access_token: config.pageAccesToken,
+      access_token: config.pageAccessToken,
       subscribed_fields: 'feed',
     })
-    log(`🔵 Try to set page subscriptions.`)
-    let response = await fetch(url, { method: 'POST' })
+
+    debug('🔵 Try to set page subscriptions.')
+
+    const response = await fetch(url, { method: 'POST' })
+
     if (response.ok) {
-      log('🟢 Page subscriptions have been set.')
+      debug('🟢 Page subscriptions have been set.')
     } else {
-      warn([`Error setting page subscriptions`, response.statusText])
+      debug('Error setting page subscriptions. Response: %O', response)
     }
+
     return true
   }
 
@@ -79,81 +96,94 @@ module.exports = class GraphApi {
         question: i18n.__('ig.menu.consultation'),
         payload: 'CON_START',
       },
-      {
-        question: i18n.__('ig.menu.telegram_chat'),
-        payload: 'TG_START',
-      },
     ]
 
-    let url = new URL(`${config.apiUrl}/me/messenger_profile`)
+    const url = new URL(`${config.apiUrl}/me/messenger_profile`)
+
     url.search = new URLSearchParams({
-      access_token: config.pageAccesToken,
+      access_token: config.pageAccessToken,
     })
-    let json = {
+
+    const json = {
       platform: 'instagram',
       ice_breakers: iceBreakers,
     }
-    log(`🔵 Try to set IceBreakers.`)
-    let response = await fetch(url, {
+
+    debug('🔵 Try to set IceBreakers')
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(json),
     })
+
     if (response.ok) {
-      log(`🟢 Icebreakers have been set.`)
+      debug(`🟢 Icebreakers have been set.`)
       return true
     } else {
-      warn(`🔴 Error setting ice breakers`, response.statusText)
+      debug(`🔴 Error setting ice breakers. Status: %s`, response.statusText)
       return false
     }
   }
 
   static async passThreadControl(senderIgsid) {
     try {
-      let url = new URL(`${config.apiUrl}/me/pass_thread_control`)
+      const url = new URL(`${config.apiUrl}/me/pass_thread_control`)
+
       url.search = new URLSearchParams({
-        access_token: config.pageAccesToken,
+        access_token: config.pageAccessToken,
       })
-      let json = {
+
+      const json = {
         recipient: { id: senderIgsid },
         target_app_id: config.instagramInboxAppId, // appid of Instagram inbox
       }
-      log(`🔵 Try to pass control.`)
-      let response = await fetch(url, {
+
+      debug(`🔵 Try to pass control.`)
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(json),
       })
-      log(['🟢 App passed thread control', response])
+
+      debug('🟢 App passed thread control. Got response:\n%O', response)
+
       return true
     } catch (e) {
-      warn(['🔴 Error pass thread control', e])
+      debug('🔴 Error pass thread control:\n%O', e)
     }
   }
 
   static async takeThreadControl(senderIgsid) {
     try {
-      let url = new URL(`${config.apiUrl}/me/take_thread_control`)
+      const url = new URL(`${config.apiUrl}/me/take_thread_control`)
+
       url.search = new URLSearchParams({
-        access_token: config.pageAccesToken,
+        access_token: config.pageAccessToken,
       })
-      let json = {
+
+      const json = {
         recipient: {
           id: senderIgsid,
         },
       }
-      log(`🔵 Try to take control.`)
-      let response = await fetch(url, {
+
+      debug('🔵 Try to take control.')
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(json),
       })
+
       if (response.ok) {
-        log(['🟢 App now is thread owner', response])
+        debug('🟢 App now is thread owner. Got response:\n%O', response)
       }
+
       return response
     } catch (e) {
-      warn([`🔴 Error setting thread owner`, e])
+      debug('🔴 Error setting thread owner.\n%O', e)
     }
   }
 }
